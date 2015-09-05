@@ -1,0 +1,6 @@
+packages
+.packages
+build/
+
+# Intellij stuff.
+.idea
