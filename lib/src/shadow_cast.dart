@@ -111,23 +111,29 @@ class ShadowCast extends Demo {
     var lineTop = (16 - _line) * 10;
     var lineBottom = 18 * 10;
 
-    strokeStyle = "rgba(200, 0, 0, 0.3)";
+    strokeStyle = "rgba(255, 255, 255, 0.3)";
     drawLine(new Vec(lineX, lineTop), new Vec(lineX, lineBottom));
-
-    strokeStyle = "rgba(220, 0, 0, 1.0)";
 
     drawShadows(int x, int lineTop, int lineBottom) {
       var lineHeight = lineBottom - lineTop;
 
       for (var shadow in shadows) {
-        var top = (1 - shadow.start) * lineHeight + lineTop;
-        var bottom = (1 - shadow.end) * lineHeight + lineTop;
+        var top = (1 - shadow.start.value) * lineHeight + lineTop;
+        var bottom = (1 - shadow.end.value) * lineHeight + lineTop;
 
-        //if (top < 4) top = 4;
+        if (x != 280) {
+          // Show the lines from the point where the shadow starts.
+          strokeStyle = "rgba(255, 255, 255, 1.0)";
+          drawLine(endpointToPixel(shadow.start), new Vec(x, top));
+          drawLine(endpointToPixel(shadow.end), new Vec(x, bottom));
+        } else {
+          // Show little notches.
+          strokeStyle = "rgba(0, 0, 0, 1.0)";
+          drawLine(new Vec(x - 2, top), new Vec(x + 2, top));
+          drawLine(new Vec(x - 2, bottom), new Vec(x + 2, bottom));
+        }
 
         drawLine(new Vec(x, top), new Vec(x, bottom));
-        drawLine(new Vec(x - 2, top), new Vec(x + 2, top));
-        drawLine(new Vec(x - 2, bottom), new Vec(x + 2, bottom));
       }
     }
 
@@ -135,6 +141,14 @@ class ShadowCast extends Demo {
     drawShadows(280, 0, 180);
 
     drawSprite(new Vec(lineX - 5, 180), Tile.slider);
+  }
+
+  Vec endpointToPixel(Endpoint endpoint) {
+    var steps = octantSteps(1);
+    var pos = steps[0] * (endpoint.row - 1) +
+              steps[1] * (endpoint.col - 1) +
+              hero;
+    return pos * 10;
   }
 }
 

@@ -55,8 +55,6 @@ class Demo {
     _canvas.width = size.x.toInt();
     _canvas.height = size.y.toInt();
 
-    _context.lineWidth = 1 * _scale;
-
     _canvas.onMouseDown.listen(_onMouseDown);
     _canvas.onMouseMove.listen(_onMouseMove);
     _canvas.onMouseUp.listen(_onMouseUp);
@@ -159,6 +157,8 @@ class Demo {
       case 6: return [new Vec(-1,  0), new Vec( 0, -1)];
       case 7: return [new Vec( 0, -1), new Vec(-1,  0)];
     }
+
+    throw "unreachable";
   }
 
   Vec _mousePos(html.MouseEvent event) {
