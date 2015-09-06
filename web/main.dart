@@ -8,7 +8,7 @@ import 'package:fov/src/octant.dart';
 import 'package:fov/src/shadow_cast.dart';
 
 main() {
-  Demo.tileset = new html.ImageElement(src: "/image/2015/08/tiles.png");
+  Demo.tileset = new html.ImageElement(src: "/image/2015/09/tiles.png");
   Demo.tileset.onLoad.listen(_start);
 }
 

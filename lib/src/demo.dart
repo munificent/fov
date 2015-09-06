@@ -4,6 +4,23 @@ import 'dart:html' as html;
 
 import 'package:piecemeal/piecemeal.dart';
 
+Vec transformOctant(int row, int col, int octant) {
+  var rowVec, colVec;
+
+  switch (octant) {
+    case 0: rowVec = Direction.N; colVec = Direction.E; break;
+    case 1: rowVec = Direction.E; colVec = Direction.N; break;
+    case 2: rowVec = Direction.E; colVec = Direction.S; break;
+    case 3: rowVec = Direction.S; colVec = Direction.E; break;
+    case 4: rowVec = Direction.S; colVec = Direction.W; break;
+    case 5: rowVec = Direction.W; colVec = Direction.S; break;
+    case 6: rowVec = Direction.W; colVec = Direction.N; break;
+    case 7: rowVec = Direction.N; colVec = Direction.W; break;
+  }
+
+  return rowVec * row + colVec * col;
+}
+
 enum Dragging {
   nothing,
   hero,
@@ -129,14 +146,13 @@ class Demo {
   }
 
   Iterable<Vec> walkOctant(Vec center, int octant, [int distance = 10]) sync* {
-    var steps = octantSteps(octant);
-
     for (var row = 1; row < distance; row++) {
       // Stop if we go out of bounds.
-      if (!tiles.bounds.contains(center + steps[0] * row)) return;
+      var pos = center + transformOctant(row, 0, octant);
+      if (!tiles.bounds.contains(pos)) return;
 
       for (var col = 0; col <= row; col++) {
-        var pos = center + steps[0] * row + steps[1] * col;
+        var pos = center + transformOctant(row, col, octant);
 
         // Skip any columns that are out of bounds.
         if (tiles.bounds.contains(pos)) {
@@ -144,21 +160,6 @@ class Demo {
         }
       }
     }
-  }
-
-  List<Vec> octantSteps(int octant) {
-    switch (octant) {
-      case 0: return [new Vec( 0, -1), new Vec( 1,  0)];
-      case 1: return [new Vec( 1,  0), new Vec( 0, -1)];
-      case 2: return [new Vec( 1,  0), new Vec( 0,  1)];
-      case 3: return [new Vec( 0,  1), new Vec( 1,  0)];
-      case 4: return [new Vec( 0,  1), new Vec(-1,  0)];
-      case 5: return [new Vec(-1,  0), new Vec( 0,  1)];
-      case 6: return [new Vec(-1,  0), new Vec( 0, -1)];
-      case 7: return [new Vec( 0, -1), new Vec(-1,  0)];
-    }
-
-    throw "unreachable";
   }
 
   Vec _mousePos(html.MouseEvent event) {

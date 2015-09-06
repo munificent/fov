@@ -18,29 +18,29 @@ enum Dragging {
 class ShadowCast extends Demo {
   static final hero = new Vec(7, 17);
 
-  int _line = 8;
+  int _line = 0;
 
   Dragging _dragging = Dragging.nothing;
   Vec _dragFrom;
 
   ShadowCast(String id) : super(id, 31, 19) {
-    tiles.get(10, 17).isWall = true;
-    tiles.get(12, 12).isWall = true;
-    tiles.get(12, 13).isWall = true;
-    tiles.get(15, 14).isWall = true;
-    tiles.get(16, 14).isWall = true;
-    tiles.get(17, 10).isWall = true;
-    tiles.get(18, 10).isWall = true;
-    tiles.get(19, 10).isWall = true;
-    tiles.get(20, 10).isWall = true;
-    tiles.get(20, 11).isWall = true;
-    tiles.get(20, 12).isWall = true;
+    tiles.get(7, 13).isWall = true;
+    tiles.get(11, 11).isWall = true;
+    tiles.get(10, 11).isWall = true;
+    tiles.get(9, 8).isWall = true;
+    tiles.get(9, 7).isWall = true;
+    tiles.get(10, 3).isWall = true;
+    tiles.get(11, 3).isWall = true;
+    tiles.get(12, 3).isWall = true;
+    tiles.get(12, 4).isWall = true;
+    tiles.get(12, 5).isWall = true;
+    tiles.get(12, 6).isWall = true;
 
     render();
   }
 
   void onMouseDown(Vec pos) {
-    if (pos.y > 17) {
+    if (pos.x < 7) {
       _dragging = Dragging.line;
       return;
     }
@@ -72,7 +72,7 @@ class ShadowCast extends Demo {
         break;
 
       case Dragging.line:
-        var line = pos.x - hero.x;
+        var line = hero.y - pos.y;
         line = math.max(0, line);
         line = math.min(17, line);
         if (_line != line) {
@@ -94,61 +94,60 @@ class ShadowCast extends Demo {
     clear();
 
     // Don't cast shadows past the line.
-    for (var pos in walkOctant(hero, 1, 18)) {
+    for (var pos in walkOctant(hero, 0, 18)) {
       tiles[pos].isVisible = true;
     }
 
-    var shadows = new Fov(this).refreshOctant(hero, 1, _line + 1);
+    var shadows = new Fov(this).refreshOctant(hero, 0, _line + 1);
 
     drawTile(hero);
     drawTile(hero, Tile.hero);
 
-    for (var pos in walkOctant(hero, 1, 18)) {
+    for (var pos in walkOctant(hero, 0, 18)) {
       drawTile(pos);
     }
 
-    var lineX = (_line + hero.x + 1) * 10;
-    var lineTop = (16 - _line) * 10;
-    var lineBottom = 18 * 10;
+    var lineY = (hero.y - _line) * 10;
+    var lineLeft = 7 * 10;
+    var lineRight = (9 + _line) * 10;
 
-    strokeStyle = "rgba(255, 255, 255, 0.3)";
-    drawLine(new Vec(lineX, lineTop), new Vec(lineX, lineBottom));
+    strokeStyle = "rgba(255, 255, 255, 0.2)";
+    drawLine(new Vec(lineLeft, lineY), new Vec(lineRight, lineY));
 
-    drawShadows(int x, int lineTop, int lineBottom) {
-      var lineHeight = lineBottom - lineTop;
+    var lineWidth = lineRight - lineLeft;
+    for (var shadow in shadows) {
+      var left = shadow.start * lineWidth + lineLeft;
+      var right = shadow.end * lineWidth + lineLeft;
 
-      for (var shadow in shadows) {
-        var top = (1 - shadow.start.value) * lineHeight + lineTop;
-        var bottom = (1 - shadow.end.value) * lineHeight + lineTop;
+      strokeStyle = "rgba(255, 255, 255, 1.0)";
+      drawLine(new Vec(left, lineY), new Vec(right, lineY));
 
-        if (x != 280) {
-          // Show the lines from the point where the shadow starts.
-          strokeStyle = "rgba(255, 255, 255, 1.0)";
-          drawLine(endpointToPixel(shadow.start), new Vec(x, top));
-          drawLine(endpointToPixel(shadow.end), new Vec(x, bottom));
-        } else {
-          // Show little notches.
-          strokeStyle = "rgba(0, 0, 0, 1.0)";
-          drawLine(new Vec(x - 2, top), new Vec(x + 2, top));
-          drawLine(new Vec(x - 2, bottom), new Vec(x + 2, bottom));
-        }
-
-        drawLine(new Vec(x, top), new Vec(x, bottom));
-      }
+      // Show the lines from the point where the shadow starts.
+      strokeStyle = "rgba(255, 255, 255, 0.3)";
+      drawLine(endpointToPixel(shadow.startPos), new Vec(left, lineY));
+      drawLine(endpointToPixel(shadow.endPos), new Vec(right, lineY));
     }
 
-    drawShadows(lineX, lineTop, lineBottom);
-    drawShadows(280, 0, 180);
+    drawSprite(new Vec(60, lineY - 5), Tile.slider);
 
-    drawSprite(new Vec(lineX - 5, 180), Tile.slider);
+    strokeStyle = "rgba(0, 0, 0, 1.0)";
+    lineY = 175;
+    lineLeft = 100;
+    lineRight = 250;
+    lineWidth = lineRight - lineLeft;
+    for (var shadow in shadows) {
+      var left = shadow.start * lineWidth + lineLeft;
+      var right = shadow.end * lineWidth + lineLeft;
+
+      // Show the lines from the point where the shadow starts.
+      drawLine(new Vec(left, lineY), new Vec(right, lineY));
+      drawLine(new Vec(left, lineY - 2), new Vec(left, lineY + 2));
+      drawLine(new Vec(right, lineY - 2), new Vec(right, lineY + 2));
+    }
   }
 
-  Vec endpointToPixel(Endpoint endpoint) {
-    var steps = octantSteps(1);
-    var pos = steps[0] * (endpoint.row - 1) +
-              steps[1] * (endpoint.col - 1) +
-              hero;
-    return pos * 10;
+  Vec endpointToPixel(Vec endpoint) {
+    return (hero + transformOctant(endpoint.y - 2, endpoint.x, 0)) * 10;
   }
 }
 
