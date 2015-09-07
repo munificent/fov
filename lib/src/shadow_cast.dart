@@ -100,7 +100,7 @@ class ShadowCast extends Demo {
 
     var shadows = new Fov(this).refreshOctant(hero, 0, _line + 1);
 
-    drawTile(hero);
+    drawTile(hero, Tile.floor);
     drawTile(hero, Tile.hero);
 
     for (var pos in walkOctant(hero, 0, 18)) {
