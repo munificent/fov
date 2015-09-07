@@ -48,10 +48,11 @@ class Fov {
           var projection = _projectTile(row, col);
 
           // Set the visibility of this tile.
-          _demo.tiles[pos].isVisible = !line.isInShadow(projection);
+          var visible = !line.isInShadow(projection);
+          _demo.tiles[pos].isVisible = visible;
 
           // Add any opaque tiles to the shadow map.
-          if (_demo.tiles[pos].isWall) {
+          if (visible && _demo.tiles[pos].isWall) {
             line.add(projection);
             fullShadow = line.isFullShadow;
           }
@@ -100,14 +101,8 @@ class ShadowLine {
     // Figure out where to slot the new shadow in the sorted list.
     var index = 0;
     for (; index < _shadows.length; index++) {
-      // See if we are at the insertion point for this shadow.
-      if (_shadows[index].end >= shadow.end) {
-        // We found where it goes. If an existing shadow completely covers it,
-        // we're done.
-        if (_shadows[index].start <= shadow.start) return;
-
-        break;
-      }
+      // Stop when we hit the insertion point.
+      if (_shadows[index].start >= shadow.start) break;
     }
 
     // The new shadow is going here. See if it overlaps the previous or next.
@@ -165,8 +160,8 @@ class Shadow {
 
   String toString() => '(${start}-${end})';
 
-  /// Returns `true` if [projection] is completely covered by this shadow.
-  bool contains(Shadow projection) {
-    return (start <= projection.start) && (end >= projection.end);
+  /// Returns `true` if [other] is completely covered by this shadow.
+  bool contains(Shadow other) {
+    return start <= other.start && end >= other.end;
   }
 }

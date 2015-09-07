@@ -5,20 +5,18 @@ import 'dart:html' as html;
 import 'package:piecemeal/piecemeal.dart';
 
 Vec transformOctant(int row, int col, int octant) {
-  var rowVec, colVec;
-
   switch (octant) {
-    case 0: rowVec = Direction.N; colVec = Direction.E; break;
-    case 1: rowVec = Direction.E; colVec = Direction.N; break;
-    case 2: rowVec = Direction.E; colVec = Direction.S; break;
-    case 3: rowVec = Direction.S; colVec = Direction.E; break;
-    case 4: rowVec = Direction.S; colVec = Direction.W; break;
-    case 5: rowVec = Direction.W; colVec = Direction.S; break;
-    case 6: rowVec = Direction.W; colVec = Direction.N; break;
-    case 7: rowVec = Direction.N; colVec = Direction.W; break;
+    case 0: return new Vec(col, -row);
+    case 1: return new Vec(row, -col);
+    case 2: return new Vec(row, col);
+    case 3: return new Vec(col, row);
+    case 4: return new Vec(-col, row);
+    case 5: return new Vec(-row, col);
+    case 6: return new Vec(-row, -col);
+    case 7: return new Vec(-col, -row);
   }
 
-  return rowVec * row + colVec * col;
+  throw "unreachable";
 }
 
 enum Dragging {
