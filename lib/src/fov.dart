@@ -18,7 +18,7 @@ class Fov {
     }
 
     // The starting position is always visible.
-    if (_demo.tiles[pos].isVisible = true);
+    _demo.tiles[pos].isVisible = true;
   }
 
   List<Shadow> refreshOctant(Vec start, int octant, [int maxRows = 999]) {
